@@ -124,30 +124,42 @@
         max-width: 58ch;
       }
 
-      .stats {
+      .verdict-guide {
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: 14px;
         margin-top: 26px;
       }
 
-      .stat {
+      .guide-card {
         padding: 18px;
         border-radius: 20px;
         background: rgba(15, 23, 42, 0.72);
         border: 1px solid rgba(148, 163, 184, 0.12);
       }
 
-      .stat strong {
+      .guide-card strong {
         display: block;
         font-size: 1.4rem;
       }
 
-      .stat span {
+      .guide-card span {
         display: block;
         margin-top: 5px;
         color: var(--muted);
         font-size: 0.95rem;
+      }
+
+      .guide-card.good strong {
+        color: #86efac;
+      }
+
+      .guide-card.medium strong {
+        color: #fde68a;
+      }
+
+      .guide-card.bad strong {
+        color: #fca5a5;
       }
 
       form {
@@ -204,6 +216,79 @@
         font-size: 0.94rem;
       }
 
+      .samples {
+        margin-top: 22px;
+        padding: 18px;
+        border-radius: 20px;
+        background: rgba(15, 23, 42, 0.62);
+        border: 1px solid rgba(148, 163, 184, 0.12);
+      }
+
+      .samples h3 {
+        font-size: 1.02rem;
+        margin-bottom: 12px;
+      }
+
+      .sample-list {
+        display: grid;
+        gap: 10px;
+      }
+
+      .sample-item {
+        padding: 12px 14px;
+        border-radius: 16px;
+        background: rgba(8, 20, 32, 0.78);
+        border: 1px solid rgba(148, 163, 184, 0.1);
+      }
+
+      .sample-row {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .sample-label {
+        display: inline-block;
+        margin-bottom: 6px;
+        font-size: 0.86rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+
+      .sample-label.good {
+        color: #86efac;
+      }
+
+      .sample-label.bad {
+        color: #fca5a5;
+      }
+
+      .sample-url {
+        color: #dbeafe;
+        font-size: 0.95rem;
+        word-break: break-all;
+      }
+
+      .copy-btn {
+        flex: 0 0 auto;
+        padding: 8px 14px;
+        border-radius: 12px;
+        border: 1px solid rgba(148, 163, 184, 0.14);
+        background: rgba(34, 197, 94, 0.15);
+        color: #d1fae5;
+        font-size: 0.88rem;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .copy-btn:hover {
+        box-shadow: none;
+        transform: none;
+        background: rgba(34, 197, 94, 0.22);
+      }
+
       .result-card {
         margin-top: 28px;
         padding: 22px;
@@ -218,6 +303,10 @@
 
       .result-card.risk {
         border-color: rgba(239, 68, 68, 0.32);
+      }
+
+      .result-card.medium {
+        border-color: rgba(250, 204, 21, 0.32);
       }
 
       .result-head {
@@ -246,6 +335,11 @@
       .badge.risk {
         background: rgba(239, 68, 68, 0.14);
         color: #fecaca;
+      }
+
+      .badge.medium {
+        background: rgba(250, 204, 21, 0.14);
+        color: #fde68a;
       }
 
       .result-meta {
@@ -405,7 +499,7 @@
           grid-template-columns: 1fr;
         }
 
-        .stats {
+        .verdict-guide {
           grid-template-columns: 1fr;
         }
 
@@ -431,18 +525,18 @@
             website patterns.
           </p>
 
-          <div class="stats">
-            <div class="stat">
-              <strong>98.78%</strong>
-              <span>Measured test accuracy</span>
+          <div class="verdict-guide">
+            <div class="guide-card good">
+              <strong>Good</strong>
+              <span>The website looks normal and safe.</span>
             </div>
-            <div class="stat">
-              <strong>97.86%</strong>
-              <span>F1 score for phishing class</span>
+            <div class="guide-card medium">
+              <strong>Medium</strong>
+              <span>The website should be checked more carefully.</span>
             </div>
-            <div class="stat">
-              <strong>549K+</strong>
-              <span>URLs used from the dataset</span>
+            <div class="guide-card bad">
+              <strong>Bad</strong>
+              <span>The website shows suspicious phishing patterns.</span>
             </div>
           </div>
 
@@ -468,17 +562,15 @@
           <div class="error">{{ result.error }}</div>
           {% endif %}
 
-          {% if result.prediction %}
-          <div class="result-card {{ 'risk' if result.is_phishing else 'safe' }}">
+          {% if result.verdict %}
+          <div class="result-card {{ result.card_tone }}">
             <div class="result-head">
               <div>
-                <h2>{{ result.prediction }}</h2>
-                <div class="result-meta">
-                  Confidence score: <strong>{{ result.confidence }}%</strong>
-                </div>
+                <h2>{{ result.verdict }}</h2>
+                <div class="result-meta">{{ result.summary }}</div>
               </div>
-              <div class="badge {{ 'risk' if result.is_phishing else 'safe' }}">
-                {{ result.status_label }}
+              <div class="badge {{ result.card_tone }}">
+                {{ result.verdict }}
               </div>
             </div>
             <div class="result-meta">
@@ -509,14 +601,58 @@
               spoofed brand names, fake paths, and malicious URL patterns.
             </li>
             <li>
-              Added a confidence score and risk hints so the prediction feels
-              easier to explain during your project demo.
+              Simplified the result into three clear classes: Good, Medium,
+              and Bad.
             </li>
             <li>
               Refined the interface for a cleaner, more modern security-focused
               presentation on desktop and mobile.
             </li>
           </ul>
+          <div class="samples">
+            <h3>Sample Links For Testing</h3>
+            <div class="sample-list">
+              <div class="sample-item">
+                <span class="sample-label good">Good Bank Website</span>
+                <div class="sample-row">
+                  <div class="sample-url">https://www.canarabank.bank.in/</div>
+                  <button
+                    type="button"
+                    class="copy-btn"
+                    data-copy-url="https://www.canarabank.bank.in/"
+                  >
+                    Copy
+                  </button>
+                </div>
+              </div>
+              <div class="sample-item">
+                <span class="sample-label bad">Fake Bank Website</span>
+                <div class="sample-row">
+                  <div class="sample-url">https://secure-canara-bank-login.example.com/</div>
+                  <button
+                    type="button"
+                    class="copy-btn"
+                    data-copy-url="https://secure-canara-bank-login.example.com/"
+                  >
+                    Copy
+                  </button>
+                </div>
+              </div>
+              <div class="sample-item">
+                <span class="sample-label bad">Piracy Movie Website</span>
+                <div class="sample-row">
+                  <div class="sample-url">https://vegamovies.foo/</div>
+                  <button
+                    type="button"
+                    class="copy-btn"
+                    data-copy-url="https://vegamovies.foo/"
+                  >
+                    Copy
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
           <div class="footer">
             Built for academic demo use. Always verify suspicious websites with
             additional security checks before trusting them.
@@ -542,5 +678,27 @@
         </div>
       </details>
     </div>
+
+    <script>
+      document.querySelectorAll(".copy-btn").forEach((button) => {
+        button.addEventListener("click", async () => {
+          const url = button.dataset.copyUrl;
+          const originalText = button.textContent;
+
+          try {
+            await navigator.clipboard.writeText(url);
+            button.textContent = "Copied";
+            setTimeout(() => {
+              button.textContent = originalText;
+            }, 1200);
+          } catch (error) {
+            button.textContent = "Failed";
+            setTimeout(() => {
+              button.textContent = originalText;
+            }, 1200);
+          }
+        });
+      });
+    </script>
   </body>
 </html>
